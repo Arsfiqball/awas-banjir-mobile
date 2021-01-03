@@ -1,6 +1,8 @@
 # Awas Banjir Mobile
 Flutter based mobile app to support [awas-banjir-cloud](https://github.com/Arsfiqball/awas-banjir-cloud) in flood potential monitoring system.
 
+![Shots](/awas_banjir_mobile_preview.gif)
+
 ## Setup
 
 1. Download and install [Android Studio][1].
