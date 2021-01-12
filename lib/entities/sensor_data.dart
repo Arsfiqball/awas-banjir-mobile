@@ -6,6 +6,8 @@ class SensorData {
   final String description;
   final SensorRecordData lastRecorded;
   final List<SensorRecordData> records;
+  final double latitude;
+  final double longitude;
 
   SensorData({
     this.id,
@@ -13,5 +15,7 @@ class SensorData {
     this.description,
     this.lastRecorded,
     this.records,
+    this.latitude,
+    this.longitude,
   });
 }

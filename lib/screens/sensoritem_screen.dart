@@ -7,6 +7,8 @@ import 'package:awas_banjir/widgets/sensor_parameter_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_map/flutter_map.dart';
+import "package:latlong/latlong.dart";
 
 class SensorItemScreen extends StatefulWidget {
   final String id;
@@ -21,10 +23,13 @@ class SensorItemScreen extends StatefulWidget {
 
 class _SensorItemScreenState extends State<SensorItemScreen> {
   final _scaffoldState = GlobalKey<ScaffoldState>();
+  final _mapController = MapController();
 
   Timer _refresherTimer;
   String _name;
   String _description;
+  double _latitude;
+  double _longitude;
   String _id;
   List<SensorRecordData> _records = [];
   SharedPreferences _prefs;
@@ -51,6 +56,9 @@ class _SensorItemScreenState extends State<SensorItemScreen> {
         _name = data.name;
         _description = data.description;
         _records = data.records;
+        _latitude = data.latitude;
+        _longitude = data.longitude;
+        _mapController.move(LatLng(_latitude, _longitude), 13);
       });
     } on AppAPIServiceNetworkError catch (err) {
       print(err);
@@ -154,6 +162,40 @@ class _SensorItemScreenState extends State<SensorItemScreen> {
       ),
       body: ListView(
         children: [
+          Container(
+            height: 240,
+            child: new FlutterMap(
+              mapController: _mapController,
+              options: new MapOptions(
+                center: new LatLng(-5.9963453, 106.0298916),
+                zoom: 13.0,
+              ),
+              layers: [
+                new TileLayerOptions(
+                  urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  subdomains: ['a', 'b', 'c'],
+                  retinaMode: true,
+                ),
+                new CircleLayerOptions(
+                  circles: _latitude != null && _longitude != null
+                      ? [
+                          new CircleMarker(
+                            point: LatLng(_latitude, _longitude),
+                            radius: 5,
+                            color: Colors.blue,
+                          ),
+                          new CircleMarker(
+                            point: LatLng(_latitude, _longitude),
+                            radius: 1000,
+                            useRadiusInMeter: true,
+                            color: Colors.blue.withOpacity(0.2),
+                          ),
+                        ]
+                      : [],
+                ),
+              ],
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

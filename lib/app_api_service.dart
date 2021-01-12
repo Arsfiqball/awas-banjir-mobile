@@ -47,6 +47,8 @@ class AppAPIService {
           id: data['_id'],
           name: data['name'],
           description: data['description'],
+          latitude: data['coordinate']['latitude'] + .0,
+          longitude: data['coordinate']['longitude'] + .0,
           records: dynamicRecords
               .map(
                 (dynamic record) => new SensorRecordData(
