@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'sensoritem_screen.dart';
+
 class SensorAddToListScreen extends StatefulWidget {
   const SensorAddToListScreen({
     Key key,
@@ -96,12 +98,18 @@ class _SensorAddToListScreenState extends State<SensorAddToListScreen> {
             name: device['name'],
             description: device['description'],
             addable: _ids.contains(device['_id']) == false,
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                '/sensor',
+                arguments: SensorItemScreenArguments(id: device['_id']),
+              );
+            },
             onPressed: () async {
               List<String> ids = _prefs.getStringList('ids') ?? [];
               ids.add(device['_id']);
               await _prefs.setStringList('ids', ids);
               firebaseMessaging.subscribeToTopic('sensor_${device['_id']}');
-              print('did');
 
               setState(() {
                 _ids.add(device['_id']);

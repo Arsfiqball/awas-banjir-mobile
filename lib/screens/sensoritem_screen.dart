@@ -52,13 +52,16 @@ class _SensorItemScreenState extends State<SensorItemScreen> {
       if (mounted == false) return;
 
       setState(() {
+        if (_latitude == null && _longitude == null) {
+          _mapController.move(LatLng(data.latitude, data.longitude), 13);
+        }
+
         _id = data.id;
         _name = data.name;
         _description = data.description;
         _records = data.records;
         _latitude = data.latitude;
         _longitude = data.longitude;
-        _mapController.move(LatLng(_latitude, _longitude), 13);
       });
     } on AppAPIServiceNetworkError catch (err) {
       print(err);
@@ -117,47 +120,50 @@ class _SensorItemScreenState extends State<SensorItemScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> ids = _prefs != null ? _prefs.getStringList('ids') ?? [] : [];
+
     return Scaffold(
       key: _scaffoldState,
       appBar: AppBar(
         title: Text(_name != null ? _name : 'Memuat...'),
         actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Apakah anda yakin?'),
-                      actions: [
-                        FlatButton(
-                          onPressed: () async {
-                            List<String> ids = _prefs.getStringList('ids');
-                            ids.remove(_id);
-                            await _prefs.setStringList('ids', ids);
-                            firebaseMessaging.unsubscribeFromTopic('sensor_$_id');
-                            print('done');
-                            Navigator.pop(context);
-                            Navigator.pop(context);
-                          },
-                          child: Text('Ya'),
-                        ),
-                        FlatButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text('Tidak'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              child: FaIcon(FontAwesomeIcons.trash),
-            ),
-          ),
+          ids.indexOf(_id) >= 0
+              ? Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Apakah anda yakin?'),
+                            actions: [
+                              FlatButton(
+                                onPressed: () async {
+                                  List<String> ids = _prefs.getStringList('ids');
+                                  ids.remove(_id);
+                                  await _prefs.setStringList('ids', ids);
+                                  firebaseMessaging.unsubscribeFromTopic('sensor_$_id');
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                },
+                                child: Text('Ya'),
+                              ),
+                              FlatButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Tidak'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: FaIcon(FontAwesomeIcons.trash),
+                  ),
+                )
+              : Text(''),
         ],
       ),
       body: ListView(

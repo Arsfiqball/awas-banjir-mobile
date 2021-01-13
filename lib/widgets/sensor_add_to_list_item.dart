@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -8,6 +7,7 @@ class SensorAddToListItem extends StatelessWidget {
   final String id;
   final bool addable;
   final Function() onPressed;
+  final Function() onTap;
 
   SensorAddToListItem({
     Key key,
@@ -16,6 +16,7 @@ class SensorAddToListItem extends StatelessWidget {
     this.id,
     this.addable = true,
     this.onPressed,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -37,26 +38,29 @@ class SensorAddToListItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 2),
-                  child: Text(
-                    name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+            child: InkWell(
+              onTap: onTap,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: Text(
+                      name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
                     ),
                   ),
-                ),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 14,
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 14,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           Column(
