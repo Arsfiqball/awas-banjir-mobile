@@ -1,14 +1,18 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:awas_banjir/entities/sensor_data.dart';
 import 'package:awas_banjir/entities/sensor_record_data.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'package:http/http.dart' as http;
-
 final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
 
 class AppAPIService {
+  static bool _certificateCheck(X509Certificate cert, String host, int port) => true;
+
+  static HttpClient client = new HttpClient()
+    ..badCertificateCallback = (_certificateCheck);
+
   static Future<List<dynamic>> getListDevices({List<String> ids, String search}) async {
     final String _apiBase = DotEnv().env['API_BASE'];
     final String configBaseURI = _apiBase != null ? _apiBase : 'https://awas-banjir.arsfiqball.com';
@@ -19,10 +23,13 @@ class AppAPIService {
         '?' + [queryIds, querySearch].where((element) => element != null && element.isNotEmpty).toList().join();
 
     try {
-      final response = await http.get('$configBaseURI/device/list$queries');
+      final url = '$configBaseURI/device/list$queries';
+      HttpClientRequest request = await client.getUrl(Uri.parse(url));
+      HttpClientResponse response = await request.close();
 
       if (response.statusCode == 200) {
-        dynamic data = json.decode(response.body);
+        final String body = await response.transform(utf8.decoder).join();
+        final dynamic data = json.decode(body);
         return List<dynamic>.from(data);
       } else {
         throw new AppAPIServiceNetworkError();
@@ -37,10 +44,13 @@ class AppAPIService {
     final String configBaseURI = _apiBase != null ? _apiBase : 'https://awas-banjir.arsfiqball.com';
 
     try {
-      final response = await http.get("$configBaseURI/device/$id?with_log=1&log_mode=$logMode");
+      final url = '$configBaseURI/device/$id?with_log=1&log_mode=$logMode';
+      HttpClientRequest request = await client.getUrl(Uri.parse(url));
+      HttpClientResponse response = await request.close();
 
       if (response.statusCode == 200) {
-        final dynamic data = json.decode(response.body);
+        final String body = await response.transform(utf8.decoder).join();
+        final dynamic data = json.decode(body);
         final List<dynamic> dynamicRecords = List<dynamic>.from(data['records']);
 
         return new SensorData(
