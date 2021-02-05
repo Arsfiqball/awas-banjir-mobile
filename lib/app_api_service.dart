@@ -32,6 +32,7 @@ class AppAPIService {
         final dynamic data = json.decode(body);
         return List<dynamic>.from(data);
       } else {
+        print(response.statusCode);
         throw new AppAPIServiceNetworkError();
       }
     } catch (err) {
