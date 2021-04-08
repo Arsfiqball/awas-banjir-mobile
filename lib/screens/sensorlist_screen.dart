@@ -31,7 +31,9 @@ class _SensorListScreenState extends State<SensorListScreen> {
     List<String> ids = _prefs.getStringList('ids') ?? [];
 
     if (ids.isEmpty) {
-      _devices = [];
+      setState(() {
+        _devices = [];
+      });
       return;
     }
 
@@ -183,29 +185,46 @@ class _SensorListScreenState extends State<SensorListScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: _handleRefreshData,
-        child: ListView(
-          children: _devices.map((dynamic device) {
-            final bool hasLastRecord = device.containsKey('last_recorded');
+        child: _devices.isNotEmpty
+            ? ListView(
+                children: _devices.map((dynamic device) {
+                  final bool hasLastRecord = device.containsKey('last_recorded');
 
-            return InkWell(
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/sensor',
-                  arguments: SensorItemScreenArguments(id: device['_id']),
-                );
-              },
-              child: SensorListItem(
-                name: device['name'],
-                description: device['description'],
-                ultrasonic: hasLastRecord ? device['last_recorded']['ultrasonic'] + .0 : .0,
-                waterlevel: hasLastRecord ? device['last_recorded']['waterlevel'] : 0,
-                power: hasLastRecord ? device['last_recorded']['power'] + .0 : 0,
-                recordedAt: hasLastRecord ? device['last_recorded']['recorded_at'] : '',
+                  return InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/sensor',
+                        arguments: SensorItemScreenArguments(id: device['_id']),
+                      );
+                    },
+                    child: SensorListItem(
+                      name: device['name'],
+                      description: device['description'],
+                      ultrasonic: hasLastRecord ? device['last_recorded']['ultrasonic'] + .0 : .0,
+                      waterlevel: hasLastRecord ? device['last_recorded']['waterlevel'] : 0,
+                      power: hasLastRecord ? device['last_recorded']['power'] + .0 : 0,
+                      recordedAt: hasLastRecord ? device['last_recorded']['recorded_at'] : '',
+                    ),
+                  );
+                }).toList(),
+              )
+            : ListView(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(30),
+                    child: Text(
+                      'Anda tidak memiliki sensor untuk dipantau, tekan ikon tambah (+) untuk menambahkan!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black38,
+                        fontSize: 16,
+                        height: 1.5,
+                      ),
+                    ),
+                  )
+                ],
               ),
-            );
-          }).toList(),
-        ),
       ),
     );
   }
